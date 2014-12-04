@@ -2,7 +2,7 @@ var EVID = 74;
 
 var investURL = "http://zc2.ayakashi.zynga.com/app.php?_c=extra_quest_event_adventure&evid=" + EVID;
 var altInvestURL = "http://zc2.ayakashi.zynga.com/app.php?evid=" + EVID + "&_c=extra_quest_event_adventure";
-var altInvestURL2 = "http://zc2.ayakashi.zynga.com/app.php?island_id=1&area_id=1&stage_id=1&no_drama=1&evid=74&newest=1&_c=ExtraQuestEventAdventure&action=stagehttp://zc2.ayakashi.zynga.com/app.php?island_id=1&area_id=1&stage_id=1&no_drama=1&evid=" + EVID + "&newest=1&_c=ExtraQuestEventAdventure&action=stage"
+var altInvestURL2 = "http://zc2.ayakashi.zynga.com/app.php?island_id=1&area_id=1&stage_id=1&no_drama=1&evid="+EVID + "&newest=1&_c=ExtraQuestEventAdventure&action=stage"
 var baseURL = "http://zc2.ayakashi.zynga.com/app.php?";
 var homeURL = "http://zc2.ayakashi.zynga.com/app.php?_c=entry&action=mypage";
 var resultURL = "http://zc2.ayakashi.zynga.com/app.php?hid=0&encounter_battle_mode=1&evid=" + EVID + "&_c=extra_quest_event_npc_battle&action=battle_result";
@@ -96,7 +96,7 @@ function click() {
                             });
                         }, function() {
                             console.log("Failed, Stopping");
-                            state = 7;
+                            state = ENDSTATE;
                         }).then(function() {
                             window.setTimeout(function() {
                                 console.log("Leader Set, Setting Team...");
@@ -112,7 +112,7 @@ function click() {
                             }, 3000);
                         }, function() {
                             console.log("Failed, Stopping");
-                            state = 7;
+                            state = ENDSTATE;
                         });
                         state = WAIT;
                     } else {
