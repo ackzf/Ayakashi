@@ -123,7 +123,7 @@ function click() {
 			if (a.window.location.href.indexOf("battle_scene") != -1 && a.document.readyState == 'complete' && a.$) {
 				HP = parseInt(a.$(a.$(".asset")[1]).attr("data-max-hit-point"));
 			}
-			console.log(HP);
+			//console.log(HP);
 		}
 	}
 	if (state != ENDSTATE)
