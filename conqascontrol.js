@@ -77,7 +77,6 @@ function click() {
 			state = ENDSTATE;
 		} else if (a.window.location.href == endURL) {
 			state = ENDSTATE;
-			killcount++;
 		} else if (!wait) {
 			if (substate == ATTACKING) {
 				a.window.location.href = fightURL;
