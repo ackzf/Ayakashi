@@ -99,6 +99,7 @@ function click() {
 }
 
 function heartbeat() {
+	a.window.location.href = "about:blank";
 	a.window.location.href = mainWindowURL;
 	checkAS();
 }
