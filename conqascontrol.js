@@ -91,14 +91,15 @@ function click() {
 			wait = false;
 		}
 	}
-	if (state == ENDSTATE)
-		heartbeat();
+	if (state == ENDSTATE){
+		a.window.location.href = "about:blank";
+		window.setTimeout(heartbeat, 3000);
+	}
 	else
 		window.setTimeout(click, 1000);
 }
 
 function heartbeat() {
-	a.window.location.href = "about:blank";
 	a.window.location.href = mainWindowURL;
 	checkAS();
 }

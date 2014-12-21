@@ -13,15 +13,13 @@ var sold = false;
 var state = INVESTIGATE;
 
 function click() {
-	console.log(current + "/" + max);
 	var delay = 1000;
 	if (state == INVESTIGATE) {
 		if ($("#card-acquisition-page").hasClass("ui-page-active")) {
 			current = parseInt($($(".current")[0]).html());
 			max = parseInt($($(".max")[0]).html());
 			var acqsrc = $($(".card")).children()[0].src;
-			var acqid = parseInt(acqsrc.substring(acqsrc.indexOf("monsters") + 9, acqsrc.indexOf("/l.jpg")));
-      console.log(acqid);			
+			var acqid = parseInt(acqsrc.substring(acqsrc.indexOf("monsters") + 9, acqsrc.indexOf("/l.jpg")));			
 			if (!sold && (acqid < 113 || acqid > 121)) {
 				$($("#do-sell")).click();
 			} else if (current == max) {
