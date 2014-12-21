@@ -7,7 +7,7 @@ var investURL = "http://zc2.ayakashi.zynga.com/app.php?_c=adventure&action=stage
 var endURL = "http://zc2.ayakashi.zynga.com/app.php?evid=" + EVID + "&_c=raid_event";
 var mainWindowURL = "http://zc2.ayakashi.zynga.com/app.php?_c=entry&action=mypage";
 
-var maxAS = 108; //maximum AS
+var maxAS = 198; //maximum AS
 var asControl = []; //cap AS targets for each level.
 
 var INVESTIGATE = 0;
