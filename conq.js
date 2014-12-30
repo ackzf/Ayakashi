@@ -1,13 +1,13 @@
 var GCQ = "guild_raid_event";
 var SCQ = "raid_event";
 
-var EVID = 75;
+var EVID = 77;
 var eventType = GCQ;
 
 var fightURL = "http://zc2.ayakashi.zynga.com/app.php?_c=" + eventType + "&action=exec_battle&evid=" + EVID;
 var investURL = "http://zc2.ayakashi.zynga.com/app.php?_c=adventure&action=stage&island_id=3&area_id=8&stage_id=11";
 var waterURL = "http://zc2.ayakashi.zynga.com/app.php?_c=item&action=use&item_id=5";
-var endURL = "http://zc2.ayakashi.zynga.com/app.php?evid=" + GCQ + "&_c=" + eventType;
+var endURL = "http://zc2.ayakashi.zynga.com/app.php?evid=" + EVID + "&_c=" + eventType;
 var cancelURL = "http://zc2.ayakashi.zynga.com/app.php?_c=" + eventType + "&action=exec_battle&evid=" + EVID;
 
 var STOPHP = 15000; // if enemy has this amount of HP or less, only hit once.
@@ -43,12 +43,12 @@ function click() {
 	var delay = 1000;
 	if (state == INVESTIGATE) {
 		if (a.window.location.href.indexOf("encounter") != -1) {
+			a.window.location.href = investURL;
+		} else if (a.window.location.href.indexOf("empty_energy") != -1) {
 			state = CONQ;
 			substate = ATTACKING;
 			a.window.location.href = "about:blank";
 			wait = false;
-		} else if (a.window.location.href.indexOf("empty_energy") != -1) {
-			state = ENDSTATE;
 		} else if (a.window.location.href.indexOf(investURL) == -1) {
 			a.window.location.href = investURL;
 		} else {
@@ -101,7 +101,7 @@ function click() {
 				state = INVESTIGATE;
 				a.window.location.href = investURL;
 				wait = true;
-			} else
+			} else if (!wait && !continuous)
 				state = ENDSTATE;
 		} else if (!wait) {
 			if (substate == DRINKING && a.window.location.href.indexOf("use") != -1) {

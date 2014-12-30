@@ -7,7 +7,7 @@ var investURL = "http://zc2.ayakashi.zynga.com/app.php?_c=adventure&action=stage
 var endURL = "http://zc2.ayakashi.zynga.com/app.php?evid=" + EVID + "&_c=raid_event";
 var mainWindowURL = "http://zc2.ayakashi.zynga.com/app.php?_c=entry&action=mypage";
 
-var maxAS = 198; //maximum AS
+var maxAS = 344; //maximum AS
 var asControl = []; //cap AS targets for each level.
 
 var INVESTIGATE = 0;
@@ -33,23 +33,16 @@ function click() {
 	var delay = 1000;
 	if (state == INVESTIGATE) {
 		if (a.document.readyState == 'complete' && a.$) {
-			if (a.window.location.href.indexOf("encounter") != -1) {
+			if (a.window.location.href.indexOf("empty_energy") != -1) {
 				state = CONQ;
 				substate = ATTACKING;
 				a.window.location.href = "about:blank";
 				wait = false;
-			} else if (a.window.location.href.indexOf("empty_energy") != -1) {
-				state = ENDSTATE;
 			} else if (a.window.location.href.indexOf(investURL) == -1) {
 				a.window.location.href = investURL;
 			} else {
 				if (a.document.readyState == 'complete' && a.$) {
-					if ($(a.$(".has-active-enemy")[0]).hasClass("on")) {
-						state = CONQ;
-						substate = ATTACKING;
-						a.window.location.href = "about:blank";
-						wait = false;
-					} else if (a.$("#card-acquisition-page").hasClass("ui-page-active")) {
+					if (a.$("#card-acquisition-page").hasClass("ui-page-active")) {
 						a.$(a.$(".button")[3]).trigger("click");
 					} else if (a.$("#encounter-other-player-page").hasClass("ui-page-active")) {
 						if (a.$(a.$(".button")[3]).attr("data-rel") == "back")
