@@ -96,12 +96,12 @@ function click() {
 				wait = true;
 			} else
 				substate = ENDSTATE;
-		} else if (a.window.location.href == endURL || a.window.location.href == cancelURL) {
-			if (!wait && continuous) {
+		} else if (!wait && (a.window.location.href == endURL || a.window.location.href == cancelURL)) {
+			if (continuous) {
 				state = INVESTIGATE;
 				a.window.location.href = investURL;
 				wait = true;
-			} else if (!wait && !continuous)
+			} else
 				state = ENDSTATE;
 		} else if (!wait) {
 			if (substate == DRINKING && a.window.location.href.indexOf("use") != -1) {
