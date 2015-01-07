@@ -13,7 +13,7 @@ var cancelURL = "http://zc2.ayakashi.zynga.com/app.php?_c=" + eventType + "&acti
 var STOPHP = 15000; // if enemy has this amount of HP or less, only hit once.
 
 var continuous = false; // true to investigate for more, false to stop when beast is killed
-var water = true; // true to auto water, false to stop when out of spirit
+var water = false; // true to auto water, false to stop when out of spirit
 
 var INVESTIGATE = 0;
 var CONQ = 1;
