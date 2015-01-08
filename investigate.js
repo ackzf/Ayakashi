@@ -16,7 +16,7 @@ var current = 0;
 var max = 30;
 var state = 0;
 var invest = window.open(investURL);
-var rem = true;          //set to false if not remming.
+var rem = true; // set to false if not remming.
 
 function click() {
 	var delay = 1000;
@@ -76,7 +76,7 @@ function click() {
 			} else if (invest.$("#parts-pvp-acquisition-page").hasClass("ui-page-active")) {
 				invest.$("#btn-adventure-l").trigger("click");
 			} else {
-				if (!(invest.$("#do-adventure").hasClass("loading"))) {
+				if (!((invest.$("#do-adventure").hasClass("loading")) || (invest.$("#cut-in-window").css("display") == 'block'))) {
 					if (current < max) {
 						invest.$("#do-adventure").trigger("click");
 					} else {
