@@ -16,7 +16,7 @@ var current = 0;
 var max = 30;
 var state = 0;
 var invest = window.open(investURL);
-var rem = true; // set to false if not remming.
+var rem = false; // set to false if not remming.
 
 function click() {
 	var delay = 1000;

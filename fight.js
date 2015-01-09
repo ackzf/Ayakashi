@@ -129,7 +129,8 @@ function hunt() {
 					search.window.location.href = waterURL;
 					state = WATER;
 				} else {
-					state = ENDSTATE;
+				  state = ATTACKING;
+					delay = 60 * 1000;
 				}
 			}
 		} else if (timeoutCounter > TIMEOUT / delay) {
