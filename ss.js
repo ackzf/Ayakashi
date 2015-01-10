@@ -282,6 +282,7 @@ function heartbeat() {
 		search.location.href = homeURL;
 		state = BASE;
 		timeoutCounter = 0;
+		setTimeout(heartbeat, delay);
 	}
 }
 
