@@ -1,5 +1,5 @@
 //walks the specified game location endlessly. Negociates without chains.
-var investURL = "http://zc2.ayakashi.zynga.com/app.php?_c=adventure&action=stage&island_id=17&area_id=63&stage_id=269";
+var investURL = "http://zc2.ayakashi.zynga.com/app.php?_c=adventure&action=stage&island_id=17&area_id=64&stage_id=274";
 var remURL = "http://zc2.ayakashi.zynga.com/app.php?_c=item&action=use&item_id=4";
 
 var INVEST = 0;
@@ -7,7 +7,7 @@ var DRAMA = 1;
 var FIGHT = 2;
 var RESULT = 3;
 var NEGO = 4;
-var ENDNEGO = 5;
+var RECOVER = 5;
 var ENDSTATE = 6;
 
 var WAIT = 999;
@@ -16,11 +16,16 @@ var current = 0;
 var max = 30;
 var state = 0;
 var invest = window.open(investURL);
-var rem = false; // set to false if not remming.
+var rem = true; // set to false if not remming.
+var reset = 0;
 
 function click() {
 	var delay = 1000;
 	console.log(current + "/" + max);
+	if (++reset >= 10)
+	{
+	state = RECOVER;
+  }
 	if (invest.document.readyState == 'complete') {
 		if (state == INVEST && invest.$ && invest.window.location.href.indexOf("npc_battle") != -1) {
 			invest.$(invest.$(".button")[0])[0].click();
@@ -42,8 +47,7 @@ function click() {
 			}
 		} else if (state == NEGO) {
 			if (invest.$ && invest.window.location.href.indexOf("negotiation") != -1) {
-				invest.$(invest.$(".button")[0])[0].click();
-				state = ENDNEGO;
+				invest.$(invest.$(".button")[0])[0].click();				
 			}
 		} else if (invest.window.location.href.indexOf("empty_energy") != -1) {
 			if (rem) {
@@ -62,8 +66,8 @@ function click() {
 			if (invest.$("#card-acquisition-page").hasClass("ui-page-active")) {
 				current = parseInt($(invest.$(".current")[0]).html());
 				max = parseInt($(invest.$(".max")[0]).html());
-				if (current == max)
-					state = ENDSTATE;
+				//if (current == max)
+//					state = ENDSTATE;
 				invest.$(invest.$(".button")[3]).trigger("click");
 			} else if (invest.$("#encounter-other-player-page").hasClass("ui-page-active")) {
 				if (invest.$(invest.$(".button")[3]).attr("data-rel") == "back")
@@ -77,11 +81,11 @@ function click() {
 				invest.$("#btn-adventure-l").trigger("click");
 			} else {
 				if (!((invest.$("#do-adventure").hasClass("loading")) || (invest.$("#cut-in-window").css("display") == 'block'))) {
-					if (current < max) {
+					//if (current < max) {
 						invest.$("#do-adventure").trigger("click");
-					} else {
-						state = ENDSTATE;
-					}
+					//} else {
+					//	state = ENDSTATE;
+					//}
 				}
 			}
 		}

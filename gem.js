@@ -1,19 +1,17 @@
 var waterURL = "http://zc2.ayakashi.zynga.com/app.php?_c=item&action=use&item_id=5";
 var homeURL = "http://zc2.ayakashi.zynga.com/app.php?_c=entry&action=mypage";
-var battleURL = "http://zc2.ayakashi.zynga.com/app.php?_c=battle";
-var killURL = "http://zc2.ayakashi.zynga.com/app.php?_c=parts_pvp_event&action=exec_battle&target_user_id=";
-var baseURL = "http://zc2.ayakashi.zynga.com/app.php?_c=parts_pvp_event";
+var killURL = "http://zc2.ayakashi.zynga.com/app.php?_c=pvp_event&action=exec_battle&target_user_id=";
+var baseURL = "http://zc2.ayakashi.zynga.com/app.php?_c=pvp_event";
 // change to the URL of your investigating chapter.
 var investURL = "http://zc2.ayakashi.zynga.com/app.php?_c=adventure&action=stage&island_id=17&area_id=64&stage_id=271";
 var remURL = "http://zc2.ayakashi.zynga.com/app.php?_c=item&action=use&item_id=4";
 
 // change to the current EVID.
-var EVID = 78;
+var EVID = 79;
 
 var LOWDS = 0;
 var LOWAS = 1;
 
-var ORIENTING = 0;
 var REFRESH = 1;
 var SEARCH = 2;
 var ATTACKING = 3;
@@ -27,8 +25,8 @@ var RESULT = 1003;
 var NEGO = 1004;
 
 var mode = LOWDS; // low ds fights enemie with less than maxDS DS, low as fights enemies with certain leads and under a certain level.
-var maxHP = 268; // change this to your maximum HP
-var asCost = 32; // change this to your bot attack team's AS cost
+var maxHP = 22; // change this to your maximum HP
+var asCost = 31; // change this to your bot attack team's AS cost
 var asasCost = 113; // change this to your as saver team's AS cost
 var maxDS = 45; // highest AS willing to hit for lowds mode.
 var maxLevel = 130; // high level you're willing to hit for lowas mode.
@@ -41,54 +39,26 @@ var leadList = [ 1, 3, 4, 5, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25,
 // DO NOT CHANGE THE FOLLOWING
 var timeoutCounter = 0;
 var stoneid = 0;
-var delay = 5000;
+var delay = 1000;
 var TIMEOUT = 10000;
 var current = 0;
 var max = 30;
 var state = ATTACKING;
-var search = window.open("http://zc2.ayakashi.zynga.com/app.php?_c=battle");
+var search = window.open("");
 var invest = search;
 var opponents;
+var searchcounter = 0;
 
 function heartbeat() {
 	if (search.document) {
 		if (search.document.readyState == 'complete' && search.$) {
-			if (state == ORIENTING) {
-				if (!$(search.document.getElementsByTagName('html')).hasClass('ui-loading')) {
-					for ( var stoneidt = 1; stoneidt < 7; stoneidt++) {
-						if ($(search.$(".monster-parts")[0]).hasClass("attribute-" + stoneidt)) {
-							stoneid = stoneidt;
-							console.log("Current Stone ID: " + stoneid);
-							break;
-						}
-					}
-					if (stoneid == 0) {
-						timeoutCounter++;
-					} else {
-						state = REFRESH;
-						timeoutCounter = 0;
-					}
-					if (timeoutCounter > TIMEOUT / delay) {
-						delay = 5000;
-						search.location.href = homeURL;
-						state = BASE;
-						timeoutCounter = 0;
-					}
-				} else if (timeoutCounter > TIMEOUT / delay) {
-					delay = 5000;
-					search.location.href = homeURL;
-					state = BASE;
-					timeoutCounter = 0;
-				} else {
-					timeoutCounter++;
-				}
-			} else if (state == REFRESH) {
+			if (state == REFRESH) {
 				$.get(baseURL, {
 					action : "battle_opponents",
-					evid : EVID,
-					target_item_id : stoneid
+					evid : EVID,					
 				}).then(function(data) {
 					console.log('Got Opponents');
+					searchcounter++;
 					opponents = data["opponents"];
 					timeoutCounter = 0;
 				}, function(error) {
@@ -104,13 +74,15 @@ function heartbeat() {
 						var leader = opponents[i]["detail"]["monsterId"];
 						if ((mode == LOWDS && def <= maxDS) || (mode == LOWAS && level < maxLevel && leadList.indexOf(leader) != -1)) {
 							console.log("Attacking: " + opponents[i]["detail"]["userId"]);
-							search.location.href = killURL + opponents[i]["detail"]["userId"] + "&target_item_id=" + stoneid + "&evid=" + EVID;
+							search.location.href = killURL + opponents[i]["detail"]["userId"] + "&target_item_id=" + EVID + "&evid=" + EVID;
 							state = ATTACKING;
 							delay = 5000;
 							break;
 						}
 					}
 					opponents = undefined;
+					if (searchcounter >= 100)
+						state = ATTACKING;
 					if (state == SEARCH)
 						state = REFRESH;
 				} else if (timeoutCounter > TIMEOUT / delay) {
@@ -123,6 +95,7 @@ function heartbeat() {
 				}
 			} else if (state == ATTACKING) {
 				search.location.href = homeURL;
+				searchcounter = 0;
 				state = BASE;
 				timeoutCounter = 0;
 			} else if (state == BASE) {
@@ -134,10 +107,9 @@ function heartbeat() {
 					var currentas = parseInt(search.$(".value")[7].innerHTML);
 					if (currentHP >= maxHP) {
 						state = INVEST;
-					} else if ((mode == LOWDS && currentas >= asCost) || (mode == LOWAS && currentas >= asasCost)) {
-						stoneid = 0;
-						search.location.href = battleURL;
-						state = ORIENTING;
+					} else if (((mode == LOWDS && currentas >= asCost) || (mode == LOWAS && currentas >= asasCost)) && search.$(search.$(".collection-progress")[0]).children().length > 0) {
+						stoneid = 0;						
+						state = REFRESH;
 						delay = 500;
 					} else {
 						if (water) {
@@ -159,9 +131,8 @@ function heartbeat() {
 			} else if (state == WATER) {
 				if (search.window.location.href.indexOf("use") != -1) {
 					timeoutCounter = 0;
-					stoneid = 0;
-					search.location.href = battleURL;
-					state = ORIENTING;
+					stoneid = 0;					
+					state = REFRESH;
 					delay = 500;
 				} else if (timeoutCounter > TIMEOUT / delay) {
 					delay = 5000;
