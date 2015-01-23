@@ -1,4 +1,4 @@
-var EVID = 74;
+var EVID = 80;
 
 var investURL = "http://zc2.ayakashi.zynga.com/app.php?_c=extra_quest_event_adventure&evid=" + EVID;
 var altInvestURL = "http://zc2.ayakashi.zynga.com/app.php?evid=" + EVID + "&_c=extra_quest_event_adventure";
@@ -60,6 +60,9 @@ function click() {
     var delay = 1000;
     if (invest.document.readyState == 'complete') {
         if (state == INVEST && invest.window.location.href.indexOf("battle_id") != -1) {
+            invest.$(invest.$(".button")[0])[0].click();
+            state = DRAMA;
+            if (0){
             enemy = getParameterByName('battle_id', invest.location)
             cost = costs[enemy];
             if (cost != undefined) {
@@ -74,6 +77,7 @@ function click() {
                 }
             } else {
                 state = ENDSTATE;
+            }
             }
         } else if (state == HOME) {
             if (invest.window.location == homeURL) {

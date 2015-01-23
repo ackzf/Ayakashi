@@ -3,7 +3,7 @@ var homeURL = "http://zc2.ayakashi.zynga.com/app.php?_c=entry&action=mypage";
 var killURL = "http://zc2.ayakashi.zynga.com/app.php?_c=pvp_event&action=exec_battle&target_user_id=";
 var baseURL = "http://zc2.ayakashi.zynga.com/app.php?_c=pvp_event";
 // change to the URL of your investigating chapter.
-var investURL = "http://zc2.ayakashi.zynga.com/app.php?_c=adventure&action=stage&island_id=17&area_id=64&stage_id=271";
+var investURL = "http://zc2.ayakashi.zynga.com/app.php?_c=adventure&action=stage&island_id=17&area_id=64&stage_id=275";
 var remURL = "http://zc2.ayakashi.zynga.com/app.php?_c=item&action=use&item_id=4";
 
 // change to the current EVID.
@@ -55,7 +55,7 @@ function heartbeat() {
 			if (state == REFRESH) {
 				$.get(baseURL, {
 					action : "battle_opponents",
-					evid : EVID,					
+					evid : EVID,
 				}).then(function(data) {
 					console.log('Got Opponents');
 					searchcounter++;
@@ -108,7 +108,7 @@ function heartbeat() {
 					if (currentHP >= maxHP) {
 						state = INVEST;
 					} else if (((mode == LOWDS && currentas >= asCost) || (mode == LOWAS && currentas >= asasCost)) && search.$(search.$(".collection-progress")[0]).children().length > 0) {
-						stoneid = 0;						
+						stoneid = 0;
 						state = REFRESH;
 						delay = 500;
 					} else {
@@ -131,7 +131,7 @@ function heartbeat() {
 			} else if (state == WATER) {
 				if (search.window.location.href.indexOf("use") != -1) {
 					timeoutCounter = 0;
-					stoneid = 0;					
+					stoneid = 0;
 					state = REFRESH;
 					delay = 500;
 				} else if (timeoutCounter > TIMEOUT / delay) {
@@ -209,15 +209,7 @@ function heartbeat() {
 				invest.window.location.href = investURL;
 				delay = 5000;
 			} else if (state == INVEST) {
-				delay = 1000;
-				if (timeoutCounter > TIMEOUT / delay) {
-					delay = 5000;
-					search.location.href = homeURL;
-					state = BASE;
-					timeoutCounter = 0;
-				} else {
-					timeoutCounter++;
-				}
+				delay = 1000;				
 				if (invest.$("#card-acquisition-page").hasClass("ui-page-active")) {
 					current = parseInt($(invest.$(".current")[0]).html());
 					max = parseInt($(invest.$(".max")[0]).html());
@@ -234,7 +226,7 @@ function heartbeat() {
 					invest.$(invest.$(".button")[3]).trigger("click");
 				} else if (invest.$("#parts-pvp-acquisition-page").hasClass("ui-page-active")) {
 					invest.$("#btn-adventure-l").trigger("click");
-				} else {
+				} else if (invest.$("#do-adventure")[0]){
 					if (!((invest.$("#do-adventure").hasClass("loading")) || (invest.$("#cut-in-window").css("display") == 'block'))) {
 						if (current < max) {
 							invest.$("#do-adventure").trigger("click");
@@ -244,9 +236,7 @@ function heartbeat() {
 						timeoutCounter = 0;
 					}
 				}
-			}
-		}
-		if (timeoutCounter > TIMEOUT / delay) {
+				if (timeoutCounter > TIMEOUT / delay) {
 					delay = 5000;
 					search.location.href = homeURL;
 					state = BASE;
@@ -254,6 +244,16 @@ function heartbeat() {
 				} else {
 					timeoutCounter++;
 				}
+			}
+		}
+		if (timeoutCounter > TIMEOUT / delay) {
+			delay = 5000;
+			search.location.href = homeURL;
+			state = BASE;
+			timeoutCounter = 0;
+		} else {
+			timeoutCounter++;
+		}
 		if (state != ENDSTATE)
 			setTimeout(heartbeat, delay);
 	} else {
