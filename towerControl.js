@@ -174,28 +174,34 @@ function heartbeat() {
 		if (search.document.readyState == 'complete' && search.$) {
 			if (state == ORIENTING) {
 				delay = 1000;
-				if (!$(search.document.getElementsByTagName('html')).hasClass('ui-loading') && search.$(".monster-parts")[0]) {
-					stoneid = 0;
-					line = search.$(".monster-parts")[0].innerHTML;
-					cut = line.indexOf("monsters");
-					line = line.substring(cut + 9);
-					cut = line.indexOf("/");
-					line = line.substring(0, cut);
-					if (line == SSID) {
-						for (stoneidt = 1; stoneidt < 7; stoneidt++) {
-							if ($(search.$(".monster-parts")[0]).hasClass("attribute-" + stoneidt)) {
-								stoneid = SSID + stoneidt;
-								console.log("Current Stone ID: " + stoneid);
-								break;
+				if (!$(search.document.getElementsByTagName('html')).hasClass('ui-loading')) {
+					if (search.$(".monster-parts")[0]){
+						stoneid = 0;
+						line = search.$(".monster-parts")[0].innerHTML;
+						cut = line.indexOf("monsters");
+						line = line.substring(cut + 9);
+						cut = line.indexOf("/");
+						line = line.substring(0, cut);
+						if (line == SSID) {
+							for (stoneidt = 1; stoneidt < 7; stoneidt++) {
+								if ($(search.$(".monster-parts")[0]).hasClass("attribute-" + stoneidt)) {
+									stoneid = SSID + stoneidt;
+									console.log("Current Stone ID: " + stoneid);
+									break;
+								}
 							}
-						}
-						if (stoneid != 0) {
+							if (stoneid != 0) {
+								state = REFRESH;
+								timeoutCounter = 0;
+							}
+						} else {
 							state = REFRESH;
 							timeoutCounter = 0;
 						}
-					} else {
+					}
+					else {
 						state = REFRESH;
-						timeoutCounter = 0;
+						timeoutCounter = 0;						
 					}
 				}
 			} else if (state == REFRESH) {
