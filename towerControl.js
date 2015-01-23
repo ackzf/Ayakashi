@@ -1,3 +1,5 @@
+//Auto Tower Runner
+
 var EVID = 80;
 var SSID = "1599";  //tower SS monster ID;
 
@@ -12,7 +14,8 @@ var battleURL = "http://zc2.ayakashi.zynga.com/app.php?_c=battle";
 var encounterURL = "http://zc2.ayakashi.zynga.com/app.php?&evid=" + EVID + "&_c=extra_quest_event_npc_battle&action=confirm&battle_id=";
 var acceptURL = "http://zc2.ayakashi.zynga.com/app.php?_c=extra_quest_event_negotiation&action=negotiate&evid=" + EVID;
 var rejectURL = "http://zc2.ayakashi.zynga.com/app.php?_c=extra_quest_event_negotiation&action=resign&evid=" + EVID;
-var teamDataURL = "http://zc2.ayakashi.zynga.com/app.php?_c=monster&action=jsonlist&list_type=offense&order_by=attack-desc&_=1421991601732";
+var teamDataURL = "http://zc2.ayakashi.zynga.com/app.php?_c=monster&action=jsonlist&list_type=offense&order_by=attack-desc";
+var investigateURL = "http://zc2.ayakashi.zynga.com/app.php?_c=ExtraQuestEventAdventure&action=proceed&island_id=1&evid=" + EVID + "&newest=1";
 
 var ORIENTING = 0;
 var REFRESH = 1;
@@ -33,8 +36,6 @@ var LEADCOMPLETE = 100996;
 var TEAMING = 100995;
 var TEAMCOMPLETE = 100994;
 var REPLACELEAD = 100993;
-
-var user = "A";
 
 var allleads = {
 	"A" : {
@@ -88,7 +89,7 @@ var allcosts = {
 };
 
 var allmaxHP = {
-	"A" : 200,
+	"A" : 600,
 	"K" : 200
 };
 var allasCost = {
@@ -116,6 +117,8 @@ var allggCost = {
 	"K" : 32
 };
 
+var user = "A";
+
 //DO NOT EDIT
 var leads = allleads[user];
 var teams = allteams[user]
@@ -133,7 +136,7 @@ var validSession = true;
 var timeoutCounter = 0;
 var stoneid = 0;
 var delay = 5000;
-var TIMEOUT = 10000;
+var TIMEOUT = 30000;
 var current = 0;
 var max = 30;
 var state = BASE;
@@ -413,6 +416,7 @@ function heartbeat() {
 					delay = 5000;
 					timeoutCounter = 0;
 					enemy = undefined;
+					state = INVEST;
 				}
 			} else if (invest.$ && invest.window.location.href.indexOf("negotiation") != -1) {
 				if (isGG) {
@@ -421,7 +425,7 @@ function heartbeat() {
 				invest.window.location = rejectURL;
 				delay = 5000;
 				state = BASE;
-				timeoutCounter = 99999;
+				validTeam = false;
 				enemy = undefined;
 			} else if (state == INVEST) {
 				if (invest.window.location.href.indexOf("npc_battle") != -1) {
@@ -429,7 +433,7 @@ function heartbeat() {
 					delay = 5000;
 					enemy = getParameterByName('battle_id', invest.location);
 					console.log("Fighting: " + enemy);
-					isGG == (enemy.chatAt(3) == '5');
+					isGG = (enemy.charAt(3) == '5');
 					invest.window.location = homeURL;
 					state = BASE;
 					timeoutCounter = 0;
@@ -498,10 +502,11 @@ function heartbeat() {
 
 function purge() {
 	console.log("Purging");
-	validSession = false;
 	if (validTeam) {
 		delay = 5000;  // simple reset.
+		$.get(investigateURL);
 	} else {
+	  validSession = false;
 		delay = 40000; // wait out all pending team changes.
 	}
 	search.location.href = homeURL;
