@@ -1,6 +1,6 @@
 // Auto Tower Runner
 // WARNING: all wandering ghosts will be automatically rejected if fought.
-var USER = "K"; // username selected
+var USER = "A"; // username selected
 var EVID = "80"; // event id of the tower
 var SSID = "1599"; // tower SS monster ID;
 
@@ -56,10 +56,10 @@ var ALLCOSTS = {
 	}
 };
 
-//WGs to buy if buyable
+// WGs to buy if buyable
 var ALLBUYWG = {
-	"A" : ["1598"],
-	"K" : ["1598"]
+	"A" : [ "1598" ],
+	"K" : [ "1598" ]
 };
 
 // HP level required before attempting to climb tower.
@@ -360,7 +360,7 @@ function heartbeat() {
 					delay = 5000;
 					enemy = getParameterByName('battle_id', operation.location);
 					console.log("Fighting: " + enemy);
-					isGG = (enemy.charAt(3) == '5');
+					isGG = (enemy.indexOf("1010") == -1);
 					operation.window.location = HOMEURL;
 					state = STATES.BASE;
 					timeoutCounter = 0;
@@ -548,7 +548,7 @@ function heartbeat() {
 
 function purge() {
 	console.log("Purging");
-	if (validTeam) {
+	if (validTeam && operation.document && operation.document.readyState == 'complete' && operation.$) {
 		delay = 5000; // simple reset.
 		$.get(WALKURL); // work around for events built into investigation page
 		state = STATES.RTB;
