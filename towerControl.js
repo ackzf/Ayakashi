@@ -1,6 +1,6 @@
 // Auto Tower Runner
 // WARNING: all wandering ghosts will be automatically rejected if fought.
-var USER = "A"; // username selected
+var USER = "K"; // username selected
 var EVID = "80"; // event id of the tower
 var SSID = "1599"; // tower SS monster ID;
 
@@ -12,7 +12,7 @@ var ALLLEADS = {
 		"10101592" : "88738",
 		"10101593" : "54046",
 		"10101594" : "86438",
-		"10101595" : "115867"
+		"10101598" : "115867"
 	},
 	"K" : {
 		"10101590" : "26116",
@@ -56,6 +56,12 @@ var ALLCOSTS = {
 	}
 };
 
+//WGs to buy if buyable
+var ALLBUYWG = {
+	"A" : ["1598"],
+	"K" : ["1598"]
+};
+
 // HP level required before attempting to climb tower.
 var ALLACTIONHP = {
 	"A" : 800,
@@ -64,7 +70,7 @@ var ALLACTIONHP = {
 
 // AS level required before attempting to attack people.
 var ALLACTIONAS = {
-	"A" : 400,
+	"A" : 300,
 	"K" : 300
 };
 
@@ -158,6 +164,7 @@ var STATES = Object.freeze({
 var LEADS = ALLLEADS[USER];
 var TEAMS = ALLTEAMS[USER];
 var COSTS = ALLCOSTS[USER];
+var BUYWG = ALLBUYWG[USER];
 var ACTIONHP = ALLACTIONHP[USER];
 var ACTIONAS = ALLACTIONAS[USER];
 var MAXDS = ALLMAXDS[USER];
@@ -177,6 +184,7 @@ var timeoutCounter = 0; // counter for determining timeout before purging.
 var delay = 5000; // delay between heartbeats
 var validTeam = true; // determines whether a team change should occur at base.
 var validSession = true; // if session is invalid, do not process any return calls
+var investigating = true; // only false when HP has run out.
 var isGG = false; // attacking a tower ghost?
 var ssFound = ALLSSFOUND[USER]; // if false, steals silver instead.
 var stoneid = 1; // current ss id;
@@ -198,20 +206,11 @@ var i; // generic for loop counter
 var def; // enemy player defense
 var ccost; // sum cost of set team during check
 var killcost; // determines if there's enough as to go for GG/WG
+var negoid; // id of the WG being negociated
+var negoidcut // cut positions of the negoid string
 
 function heartbeat() {
-	if (DISPLAYLOGS) {
-		console.log("------INIT------");
-		console.log("state:" + state);
-		console.log("timeoutCounter:" + timeoutCounter);
-		console.log("delay:" + delay);
-		console.log("validTeam:" + validTeam);
-		console.log("validSession:" + validSession);
-		console.log("isGG: " + isGG);
-		console.log("ssFound" + ssFound);
-		console.log("stoneid:" + stoneid);
-		console.log("searchAttempts:" + searchAttempts);
-	}
+	displayLogs("------INIT------");
 	if (operation.document) {
 		if (operation.document.readyState == 'complete' && operation.$) {
 			if (state == STATES.RTB) {
@@ -333,7 +332,7 @@ function heartbeat() {
 						operation.window.location = ENCOUNTERURL + enemy + (isGG ? "" : "&encounter_battle_mode=1");
 						state = STATES.RETURN;
 						delay = 5000;
-					} else if (!enemy && currentHP >= ACTIONHP) {
+					} else if (!enemy && (investigating || currentHP >= ACTIONHP)) {
 						state = STATES.INVESTIGATE;
 					} else if (!enemy && currentas >= ACTIONAS) {
 						if (ssFound) {
@@ -368,14 +367,25 @@ function heartbeat() {
 				} else if (operation.window.location.href.indexOf("negotiation") != -1) {
 					if (isGG) {
 						operation.window.location = ACCEPTURL;
+					} else {
+						negoid = $(operation.$(".monster")[0]).children()[0].style.background
+						negoidcut = negoid.indexOf("/monsters/");
+						negoid = negoid.substring(negoidcut + 10);
+						negoidcut = negoid.indexOf("/");
+						negoid = negoid.substring(0, negoidcut);
+						if ((BUYWG.indexOf(negoid) == -1) || (operation.$("#use-item-button").attr("disabled") == "disabled")) {
+							operation.window.location = REJECTURL;
+						} else {
+							operation.window.location = ACCEPTURL + "&method=use";
+						}
 					}
-					operation.window.location = REJECTURL;
 					delay = 5000;
 					state = STATES.RTB;
 					validTeam = false;
 					enemy = undefined;
 				} else if (operation.window.location.href.indexOf("empty_energy") != -1) {
 					state = STATES.RTB;
+					investigating = false;
 				} else if ((operation.window.location.href.indexOf(TOWERURL) == -1) && (operation.window.location.href.indexOf(TOWERURL2) == -1) && (operation.window.location.href.indexOf(TOWERURL3) == -1)) {
 					operation.window.location.href = TOWERURL;
 					delay = 5000;
@@ -409,6 +419,7 @@ function heartbeat() {
 					} else if (operation.$("#do-adventure")[0]) {
 						if (!((operation.$("#do-adventure").hasClass("loading")) || (operation.$("#cut-in-window").css("display") == 'block'))) {
 							operation.$("#do-adventure").trigger("click");
+							investigating = true;
 						}
 					}
 				}
@@ -454,6 +465,7 @@ function heartbeat() {
 						timeoutCounter = 0;
 						$.get(ACCEPTSSURL + SSID);
 						stoneid = 1;
+						delay = 5000;
 					} else if (operation.$(".data").children()[3].innerHTML.charAt(0) == "0") {
 						state = STATES.SEARCH;
 						timeoutCounter = 0;
@@ -518,18 +530,7 @@ function heartbeat() {
 				}
 			}
 		}
-		if (DISPLAYLOGS) {
-			console.log("------END------");
-			console.log("state:" + state);
-			console.log("timeoutCounter:" + timeoutCounter);
-			console.log("delay:" + delay);
-			console.log("validTeam:" + validTeam);
-			console.log("validSession:" + validSession);
-			console.log("isGG: " + isGG);
-			console.log("ssFound" + ssFound);
-			console.log("stoneid:" + stoneid);
-			console.log("searchAttempts:" + searchAttempts);
-		}
+		displayLogs("------END------");
 		if (timeoutCounter > TIMEOUT / delay) {
 			console.log("Timeout");
 			purge();
@@ -550,12 +551,15 @@ function purge() {
 	if (validTeam) {
 		delay = 5000; // simple reset.
 		$.get(WALKURL); // work around for events built into investigation page
+		state = STATES.RTB;
 	} else {
+		investigating = false;
 		validSession = false;
 		delay = 40000; // wait out all pending team changes.
+		operation.location.href = HOMEURL;
+		state = STATES.BASE;
 	}
-	operation.location.href = HOMEURL;
-	state = STATES.BASE;
+
 	timeoutCounter = 0;
 	window.setTimeout(heartbeat, delay);
 }
@@ -564,6 +568,22 @@ function getParameterByName(name, loc) {
 	name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
 	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"), results = regex.exec(loc.search);
 	return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function displayLogs(title) {
+	if (DISPLAYLOGS) {
+		console.log(title);
+		console.log("state:" + state);
+		console.log("timeoutCounter:" + timeoutCounter);
+		console.log("delay:" + delay);
+		console.log("validTeam:" + validTeam);
+		console.log("validSession:" + validSession);
+		console.log("investigating:" + investigating);
+		console.log("isGG: " + isGG);
+		console.log("ssFound" + ssFound);
+		console.log("stoneid:" + stoneid);
+		console.log("searchAttempts:" + searchAttempts);
+	}
 }
 
 heartbeat();
