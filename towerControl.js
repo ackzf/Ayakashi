@@ -147,9 +147,15 @@ var ALLATTACKTEAMCOST = {
 };
 
 // true if the user has found a seal stone, false otherwise.
+var ALLSSFIGHT = {
+	"A" : false,
+	"K" : true
+};
+
+// true if the user has found a seal stone, false otherwise.
 var ALLSSFOUND = {
 	"A" : true,
-	"K" : false
+	"K" : true
 };
 
 // DO NOT EDIT below this line
@@ -219,6 +225,7 @@ var MAXDS = ALLMAXDS[USER];
 var ATTACKLEAD = ALLATTACKLEAD[USER];
 var ATTACKTEAM = ALLATTACKTEAM[USER];
 var ATTACKTEAMCOST = ALLATTACKTEAMCOST[USER];
+var SSFIGHT = ALLSSFIGHT[USER];
 
 // other constants
 var TIMEOUT = 30000; // number of miliseconds before purging
@@ -383,7 +390,7 @@ function heartbeat() {
 					} else if (!enemy && (investigating || currentHP >= ACTIONHP)) {
 						state = STATES.INVESTIGATE;
 					} else if (!enemy && currentas >= ACTIONAS) {
-						if (ssFound) {
+						if (SSFIGHT && ssFound) {
 							stoneid = 1;
 							operation.window.location = BATTLESSURL + SSID + stoneid;
 							state = STATES.ORIENTING;
