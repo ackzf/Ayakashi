@@ -92,7 +92,7 @@ function heartbeat() {
 					if (currentHP >= ACTIONHP) {
 						state = STATES.INVESTIGATE;
 					} else if (currentas >= ACTIONAS) {
-						state = STATES.REFRESH;
+						state = STATES.SEARCH;
 						delay = 5000;
 					} else {
 						state = STATES.RTB;
