@@ -9,7 +9,7 @@ var ALLACTIONHP = {
 
 // AS level required before attempting to attack people.
 var ALLACTIONAS = {
-	"A" : 447,
+	"A" : 30,
 	"K" : 30
 };
 
@@ -125,7 +125,7 @@ function heartbeat() {
 							break;
 						}
 					}
-					if (searchAttempts >= MAXATTEMPTS) {
+					if (searchAttempts++ >= MAXATTEMPTS) {
 						state = STATES.RTB;
 						searchAttempts = 0;
 					}
